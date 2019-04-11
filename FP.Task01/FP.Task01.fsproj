@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="LoopsMethod.fs" />
+    <Compile Include="PairsToResultMethod.fs" />
+    <Compile Include="ResultToPairsParsingMethod.fs" />
+    <Compile Include="Task01.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.1.2" />
+    <PackageReference Include="FSharpPlus" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CS.Task01\CS.Task01.csproj" />
+  </ItemGroup>
+
+</Project>
