@@ -58,3 +58,10 @@ module PropertyBasedTests =
   [<Property>]
   let ``Trees are balanced and are BST`` (trees : List<BinarySearchTree>) =
     List.forall (fun (t : BinarySearchTree) -> t.IsBalanced && t.IsBST) trees
+
+  [<Property(MaxTest = 1000, StartSize = 10, EndSize = 10000)>]
+  let ``List adding works`` (xs : List<int>) =
+    let tree = Empty.AddMany xs
+
+    Seq.toList (tree.Traverse InFix)
+    |> should equal (List.sort (List.distinct xs))

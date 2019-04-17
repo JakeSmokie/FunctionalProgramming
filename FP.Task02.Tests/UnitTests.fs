@@ -197,3 +197,18 @@ let ``Is special case covered``() =
       )
     )
   )
+
+[<Fact>]
+let ``Adding same element doesn't affect tree``() =
+  let tree = Empty.AddMany [ 1; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; ]
+
+  tree |> should equal (
+    Node(1, Node(0, Empty, Empty), Empty)
+  )
+
+[<Fact>]
+let ``Specific case with double left rotation``() =
+  let tree = Empty.AddMany [3; 1; 2; -2; -1; 0]
+
+  Seq.toList (tree.Traverse InFix)
+    |> should equal [-2; -1; 0; 1; 2; 3]

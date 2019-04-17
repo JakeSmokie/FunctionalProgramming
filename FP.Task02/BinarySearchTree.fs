@@ -13,7 +13,7 @@ type BinarySearchTree =
       | Empty -> Node(x, Empty, Empty)
       | Node(value, left, right) when x < value -> Node(value, (insert' left).PerformBalance(), right)
       | Node(value, left, right) when x > value -> Node(value, left, (insert' right).PerformBalance())
-      | _ -> this
+      | _ -> node
 
     (insert' this).PerformBalance()
 
@@ -122,7 +122,7 @@ type BinarySearchTree =
       let (lrx, lrl, lrr) = lr.Deconstruct()
 
       Node(lrx,
-        Node(lx, ll, Empty),
+        Node(lx, ll, lrl),
         Node(x, lrr, r)
       )
 
@@ -133,7 +133,7 @@ type BinarySearchTree =
 
       Node(rlx,
         Node(x, l, rll),
-        Node(rx, Empty, rr)
+        Node(rx, rlr, rr)
       )
 
     match this with
