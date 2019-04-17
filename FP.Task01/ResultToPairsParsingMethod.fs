@@ -3,15 +3,15 @@ open FSharpPlus
 open FSharp.Collections.ParallelSeq
 
 let makePalindrome x =
-  let s = x |> string
-  s + rev s |> int
+  let s = string x
+  int (s + rev s)
 
-let palindromes = 
-  Seq.initInfinite (fun x -> makePalindrome x)
+let palindromes =
+  Seq.initInfinite makePalindrome
 
 let getResult n =
-  let maxPalindrome = int (10.0 ** (float n * 2.0))
-  let maxMultiplier = int (10.0 ** float n)
+  let maxPalindrome = pown 10 (n * 2)
+  let maxMultiplier = pown 10 n
 
   let rec checkFactors a b =
     match a, b with
@@ -22,5 +22,5 @@ let getResult n =
   let p = PSeq.takeWhile (fun x -> x < maxPalindrome) palindromes
   let filtered = PSeq.filter (fun x -> checkFactors x (maxMultiplier - 1)) p
   let max = PSeq.max filtered
-  
+
   max

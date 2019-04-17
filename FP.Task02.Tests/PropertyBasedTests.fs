@@ -1,26 +1,60 @@
-﻿module FP.Task02.Tests.PropertyBasedTests
+﻿namespace FP.Task02.Tests
 
-open FP.Task02
 open FsUnit.Xunit
+open FP.Task02
+open FsCheck
 open FsCheck.Xunit
 
-[<Property>]
-let ``Min and Max methods work correctly`` (xs : List<int>) =
-  let elems = (xs @ [1; 2; 3]) |> List.distinct
-  let tree = elems |> List.fold ((+)) BinarySearchTree.Zero  
+type MyGenerators =
+  static member Tree() = {
+    new Arbitrary<BinarySearchTree>() with
+      override x.Generator =
+        let tree' n =
+          let nums = Gen.choose (-2_000_000_000, 2_000_000_000) |> Gen.sample 0 n
+          Gen.constant (Empty.AddMany nums)
 
-  tree.Min |> should equal (List.min elems)
-  tree.Max |> should equal (List.max elems)
+        Gen.sized tree'
+      override x.Shrinker t = Seq.empty
+  }
 
-[<Property>]
-let ``Traversals work correctly`` (xs : List<int>) =
-  let elems = (xs @ [1; 2; 3]) |> List.distinct
-  let tree = elems |> List.fold ((+)) BinarySearchTree.Zero  
+[<Properties(Arbitrary=[| typeof<MyGenerators> |])>]
+module PropertyBasedTests =
+  let rec allElementsEqual f = function
+  | [ x ] -> true
+  | [] -> true
+  | x :: y :: tail when f x y -> allElementsEqual f (y :: tail)
+  | _ -> false
 
-  tree >>= InFix 
-  |> Seq.toList
-  |> should equal (List.sort elems)
-  
-  tree >>= PostFix 
-  |> Seq.toList
-  |> should equal (List.sortDescending elems)
+  [<Property(MaxTest = 10, StartSize = 1, EndSize = 100)>]
+  let ``Concatecation is associative`` (trees : List<BinarySearchTree>) =
+    let a = List.fold (fun (acc : BinarySearchTree) x -> acc.Concat x) Empty trees
+    let b = List.foldBack (fun (acc : BinarySearchTree) x -> acc.Concat x) trees Empty
+
+    let shuffledSums =
+      Gen.shuffle trees
+      |> Gen.sample 0 20
+      |> List.map (fun trees -> Array.fold (fun (acc : BinarySearchTree) x -> acc.Concat x) Empty trees)
+
+    allElementsEqual ((=)) (a :: b :: shuffledSums)
+
+  [<Property>]
+  let ``Zero + A = A + Zero = A`` (tree : BinarySearchTree) =
+    let a = Seq.toList ((tree.Concat Empty).Traverse InFix)
+    let b = Seq.toList ((Empty.Concat tree).Traverse InFix)
+    let c = Seq.toList (tree.Traverse InFix)
+
+    a = c && b = c
+
+  [<Property>]
+  let ``InFix Traversal produces sorted list`` (tree : BinarySearchTree) =
+    let a = Seq.toList (tree.Traverse InFix)
+    let b = Seq.toList (tree.Traverse PostFix)
+
+    allElementsEqual ((<)) a |> should be True
+    allElementsEqual ((>)) b |> should be True
+    tree.Min |> should equal a.Head
+    tree.Max |> should equal b.Head
+
+  [<Property>]
+  let ``Trees are balanced and are BST`` (trees : List<BinarySearchTree>) =
+    List.forall (fun (t : BinarySearchTree) -> t.IsBalanced && t.IsBST) trees

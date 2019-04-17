@@ -1,23 +1,16 @@
 ﻿module FP.Task02.Program
 
+open FP.Task02
 open System
 
 [<EntryPoint>]
 let main argv =
   let r = Random(100)
 
-  let first = 
-    [1 .. 1000000]
-    |> List.sortBy (fun _ -> r.Next())
-    |> List.fold (fun tree x -> tree + x) (BinarySearchTree.Zero)
+  let arr = [ 1; 2; 3 ] // List.sortBy (fun _ -> r.Next())
+  let first = (Empty.AddMany arr).PerformBalance()
 
-  printfn "%d" first.Min
-  printfn "%d" first.Max
+  printfn "%d" first.Height
+  printfn "%d" first.Balance
 
-  let second = 
-    [1000100 .. 1003000]
-    |> List.sortBy (fun _ -> r.Next())
-    |> List.fold (fun tree x -> tree + x) (BinarySearchTree.Zero)
-
-  let c = first + second
   0

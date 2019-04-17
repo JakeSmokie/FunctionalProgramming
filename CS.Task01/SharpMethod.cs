@@ -23,7 +23,9 @@ namespace CS.Task01 {
                 var any = false;
 
                 Parallel.ForEach(partitioner, range => {
-                    for (var i = range.Item1; i < range.Item2; i++) {
+                    var (a, b) = range;
+
+                    for (var i = a; i < b; i++) {
                         if (x % i == 0 && x / i < maxMultiplier) {
                             any = true;
                         }

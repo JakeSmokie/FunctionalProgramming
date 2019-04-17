@@ -1,61 +1,53 @@
 ﻿namespace FP.Task02
 
-open System.Collections.Generic
+type TraversalType =
+  | InFix | PreFix | PostFix
 
-type BSTNode<'a> = 
+type BinarySearchTree =
   | Empty
-  | Node of value: 'a * left: BSTNode<'a> * right: BSTNode<'a>
+  | Node of int * BinarySearchTree * BinarySearchTree
 
-type TraversalType = 
-  | InFix
-  | PreFix
-  | PostFix
-
-type BinarySearchTree<'a when 'a : comparison> private (treeRoot) =
-  let root = treeRoot  
-
-  interface IEnumerable<'a> with
-    member this.GetEnumerator(): IEnumerator<'a> = 
-      (this.Traverse InFix).GetEnumerator()
-
-    member this.GetEnumerator(): System.Collections.IEnumerator = 
-       (this.Traverse InFix).GetEnumerator() :> System.Collections.IEnumerator
-  
-  member this.Insert x =
-    let rec insert' node = 
+  member this.Add x =
+    let rec insert' node =
       match node with
-      | Empty -> Node (x, Empty, Empty)
-      | Node (value, left, right) when x < value -> Node (value, insert' left, right)
-      | Node (value, left, right) when x > value -> Node (value, left, insert' right)
-      | _ -> sprintf "%A already exists" x |> failwith 
+      | Empty -> Node(x, Empty, Empty)
+      | Node(value, left, right) when x < value -> Node(value, (insert' left).PerformBalance(), right)
+      | Node(value, left, right) when x > value -> Node(value, left, (insert' right).PerformBalance())
+      | _ -> this
 
-    BinarySearchTree(insert' root)
+    (insert' this).PerformBalance()
+
+  member this.AddMany(xs : int seq) =
+    Seq.fold (fun (tree : BinarySearchTree) x -> tree.Add x) this xs
+
+  member this.AddMany(xs : int list) =
+    List.fold (fun (tree : BinarySearchTree) x -> tree.Add x) this xs
 
   member this.Delete x =
     let rec findInOrderPredecessor node =
       match node with
       | Empty -> Empty
-      | Node (_, _, Empty) -> node
-      | Node (_, _, right) -> findInOrderPredecessor right 
+      | Node(value, _, Empty) -> node
+      | Node(_, _, right) -> findInOrderPredecessor right
 
     let rec delete' x node =
       match node with
       | Empty -> Empty
-      | Node (value, left, right) when x < value -> Node (value, delete' x left, right)
-      | Node (value, left, right) when x > value -> Node (value, left, delete' x right)
-      | Node (_, Empty, Empty) -> Empty
-      | Node (_, left, Empty) -> left
-      | Node (_, Empty, right) -> right
-      | Node (_, left, right) ->
+      | Node(value, left, right) when x < value -> Node(value, (delete' x left).PerformBalance(), right)
+      | Node(value, left, right) when x > value -> Node(value, left, (delete' x right).PerformBalance())
+      | Node(_, Empty, Empty) -> Empty
+      | Node(_, left, Empty) -> left
+      | Node(_, Empty, right) -> right
+      | Node(_, left, right) ->
         let (Node(value, _, _)) = findInOrderPredecessor left
-        Node (value, delete' value left, right)
+        Node(value, (delete' value left).PerformBalance(), right)
 
-    BinarySearchTree(delete' x root)
+    (delete' x this).PerformBalance()
 
   member this.Traverse traversalType =
     let rec traverse' = function
       | Empty -> Seq.empty
-      | Node (value, left, right) -> seq {
+      | Node(value, left, right) -> seq {
         match traversalType with
         | PreFix ->
           yield value
@@ -70,55 +62,116 @@ type BinarySearchTree<'a when 'a : comparison> private (treeRoot) =
           yield value
           yield! traverse' left
       }
-      
-    traverse' root
 
-  member this.Min 
-    with get() = 
-      let rec min' = function
-      | Empty -> failwith "Tree is empty"
-      | Node (value, Empty, _) -> value
-      | Node (_, left, _) -> min' left
+    traverse' this
 
-      min' root
+  member this.Min =
+    let rec min' = function
+    | Empty -> failwith "Tree is empty"
+    | Node(value, Empty, _) -> value
+    | Node(_, left, _) -> min' left
 
-  member this.Max
-    with get() = 
-      let rec max' = function
-      | Empty -> failwith "Tree is empty"
-      | Node (value, _, Empty) -> value
-      | Node (_, _, right) -> max' right
+    min' this
 
-      max' root
+  member this.Max =
+    let rec max' = function
+    | Empty -> failwith "Tree is empty"
+    | Node(value, _, Empty) -> value
+    | Node(_, _, right) -> max' right
 
-  member this.Depth
-    with get() = 
-      let rec depth' node d =
-        match node with
-        | Empty -> d
-        | Node (_, left, right) -> 
-          let l = max d (depth' left (d + 1))
-          let r = max d (depth' right (d + 1))
+    max' this
 
-          max l r
+  member this.Height =
+    let rec depth' node d =
+      match node with
+      | Empty -> d
+      | Node(_, left, right) ->
+        let l = max d (depth' left (d + 1))
+        let r = max d (depth' right (d + 1))
 
-      depth' root 0
+        max l r
 
-  member this.Root
-    with get() =
-      root
+    depth' this 0
 
-  static member (+) (a: BinarySearchTree<'a>, b: 'a) = a.Insert b
-  static member (-) (a: BinarySearchTree<'a>, b: 'a) = a.Delete b
-  static member (>>=) (a: BinarySearchTree<'a>, b: TraversalType) = a.Traverse b
-  static member Zero with get() = BinarySearchTree<'a>()
+  member this.Balance =
+    match this with
+    | Empty -> 0
+    | Node(_, left, right) -> left.Height - right.Height
 
-  member this.Concatecate otherTree =
-    let insert' = Seq.fold (fun (tree: BinarySearchTree<'a>) x -> tree.Insert x)
-    
-    this >>= PreFix
-    |> insert' (BinarySearchTree<'a>()) >>= PreFix
-    |> insert' otherTree
-  
-  static member (+) (a: BinarySearchTree<'a>, b: BinarySearchTree<'a>) = a.Concatecate b
-  private new() = BinarySearchTree<'a>(Empty)
+  member this.Deconstruct() =
+    match this with
+    | Node(x, l, r) -> (x, l, r)
+    | Empty -> failwith "Cannot deconstruct empty node"
+
+  member this.PerformBalance() =
+    let rotRight() =
+      let (x, l, r) = this.Deconstruct()
+      let (lx, ll, lr) = l.Deconstruct()
+
+      Node(lx, ll, Node(x, lr, r))
+
+    let rotLeft() =
+      let (x, l, r) = this.Deconstruct()
+      let (rx, rl, rr) = r.Deconstruct()
+
+      Node(rx, Node(x, l, rl), rr)
+
+    let doubleRotRight() =
+      let (x, l, r) = this.Deconstruct()
+      let (lx, ll, lr) = l.Deconstruct()
+      let (lrx, lrl, lrr) = lr.Deconstruct()
+
+      Node(lrx,
+        Node(lx, ll, Empty),
+        Node(x, lrr, r)
+      )
+
+    let doubleRotLeft() =
+      let (x, l, r) = this.Deconstruct()
+      let (rx, rl, rr) = r.Deconstruct()
+      let (rlx, rll, rlr) = rl.Deconstruct()
+
+      Node(rlx,
+        Node(x, l, rll),
+        Node(rx, Empty, rr)
+      )
+
+    match this with
+    | Node(_, l, r) when this.Balance > 1 ->
+      if l.Balance >= 1 then rotRight()
+      else doubleRotRight()
+    | Node(_, l, r) when this.Balance < -1 ->
+      if r.Balance <= -1 then rotLeft()
+      else doubleRotLeft()
+    | _ -> this
+
+  member this.IsBST =
+    let rec verify l r node =
+      match node with
+      | Empty -> true
+      | Node(value, left, right) ->
+        match l, r with
+        | Some left, _ when value < left -> false
+        | _, Some right when value > right -> false
+        | _ ->
+          let l' = defaultArg r value |> min value |> Some
+          let r' = defaultArg l value |> max value |> Some
+
+          verify l l' left && verify r' r right
+
+    verify None None this
+
+  member this.IsBalanced =
+    let rec verify = function
+    | Node(_, l, r) ->
+      ((abs this.Balance) <= 1) && verify l && verify r
+    | Empty -> true
+
+    verify this
+
+  member this.Concat(other : BinarySearchTree) =
+    let a = this.Traverse InFix
+    let b = other.Traverse InFix
+    let c = Seq.sort (Seq.distinct (Seq.concat [ a; b ]))
+
+    Empty.AddMany c
