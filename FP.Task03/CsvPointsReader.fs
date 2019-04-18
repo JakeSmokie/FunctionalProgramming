@@ -1,5 +1,5 @@
 module FP.Task03.CsvPointsReader
-open System.IO
+open System
 open FSharp.Data
 
 type Points =
@@ -7,15 +7,21 @@ type Points =
               Schema="x (float), y (float)",
               HasHeaders=false>
 
-let getPointsOfCsv (file : string) =
-  let points = Points.Load(file)
+let rec readlines() = seq {
+  let line = stdin.ReadLine()
+  if line <> null then
+    yield line
+    yield! readlines()
+}
 
-  points.Rows
+let getPointsOfCsv() =
+  let rawCsv = String.Join("\n", readlines())
+  let points = Points.ParseRows(rawCsv)
+
+  points
   |> Seq.map (fun row -> (row.X, row.Y))
   |> Seq.toList
 
-let savePointsToCsv (points : list<float * float>) (file : string) =
-  if File.Exists(file) then File.Delete (file)
-  
+let savePointsToCsv (points : (float * float) list) =
   let doc = new Points(List.map (Points.Row) points)
-  doc.Save(file)
+  printfn "%s" (doc.SaveToString())

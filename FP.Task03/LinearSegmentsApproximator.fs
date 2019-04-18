@@ -8,7 +8,7 @@ let rec findRange t xs =
   | a :: b :: tail -> findRange t (b :: tail)
   | _ -> failwith "Cannot find suitable range"
 
-let approximateByPoints (points : list<float * float>) t =
+let approximateByPoints (points : (float * float) list) t =
   let rangeBounds =
     PSeq.distinctBy (fun (x, y) -> x) points
     |> PSeq.sortBy (fun (x, y) -> x)
