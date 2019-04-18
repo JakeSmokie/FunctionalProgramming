@@ -14,14 +14,12 @@ let rec readlines() = seq {
     yield! readlines()
 }
 
-let getPointsOfCsv() =
+let readPoints() =
   let rawCsv = String.Join("\n", readlines())
   let points = Points.ParseRows(rawCsv)
 
-  points
-  |> Seq.map (fun row -> (row.X, row.Y))
-  |> Seq.toList
+  points |> Seq.map (fun row -> (row.X, row.Y))
 
-let savePointsToCsv (points : (float * float) list) =
-  let doc = new Points(List.map (Points.Row) points)
+let printPoints points =
+  let doc = new Points(List.map Points.Row points)
   printfn "%s" (doc.SaveToString())

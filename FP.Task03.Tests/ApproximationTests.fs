@@ -13,12 +13,11 @@ let validateOnRange app f a b step checkStep maxError =
   let lagrange = app interpolationPoints
   let actual = genValues lagrange a b checkStep    
   
-  let check i (ax, ay) =
-    let (bx, by) = expected.[i]
+  let checkError (ax, ay) (bx, by) =
     abs (by - ay) |> should lessThan maxError
     abs (bx - ax) |> should lessThan 0.0000000001
 
-  List.iteri check actual
+  List.iter2 checkError expected actual
 
 [<Fact>]
 let ``functions are interpolated correctly``() =

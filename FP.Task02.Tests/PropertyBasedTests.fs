@@ -19,14 +19,14 @@ type MyGenerators =
 
 [<Properties(Arbitrary=[| typeof<MyGenerators> |])>]
 module PropertyBasedTests =
-  let rec allElementsEqual f = function
+  let rec allElementsFollowOperator f = function
   | [ x ] -> true
   | [] -> true
-  | x :: y :: tail when f x y -> allElementsEqual f (y :: tail)
+  | x :: y :: tail when f x y -> allElementsFollowOperator f (y :: tail)
   | _ -> false
 
   [<Property(MaxTest = 10, StartSize = 1, EndSize = 100)>]
-  let ``Concatecation is associative`` (trees : List<BinarySearchTree>) =
+  let ``Concatecation is associative`` (trees : BinarySearchTree list) =
     let a = List.fold (fun (acc : BinarySearchTree) x -> acc.Concat x) Empty trees
     let b = List.foldBack (fun (acc : BinarySearchTree) x -> acc.Concat x) trees Empty
 
@@ -35,7 +35,7 @@ module PropertyBasedTests =
       |> Gen.sample 0 20
       |> List.map (fun trees -> Array.fold (fun (acc : BinarySearchTree) x -> acc.Concat x) Empty trees)
 
-    allElementsEqual ((=)) (a :: b :: shuffledSums)
+    allElementsFollowOperator ((=)) (a :: b :: shuffledSums)
 
   [<Property>]
   let ``Zero + A = A + Zero = A`` (tree : BinarySearchTree) =
@@ -50,13 +50,13 @@ module PropertyBasedTests =
     let a = Seq.toList (tree.Traverse InFix)
     let b = Seq.toList (tree.Traverse PostFix)
 
-    a |> should be ascending
+    a |> should be ascending // allElementsFollowOperator ((<)) a
     b |> should be descending
     tree.Min |> should equal a.Head
     tree.Max |> should equal b.Head
 
   [<Property>]
-  let ``Trees are balanced and are BST`` (trees : List<BinarySearchTree>) =
+  let ``Trees are balanced and are BST`` (trees : BinarySearchTree list) =
     List.forall (fun (t : BinarySearchTree) -> t.IsBalanced && t.IsBST) trees
 
   [<Property(MaxTest = 1000, StartSize = 10, EndSize = 10000)>]

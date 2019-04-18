@@ -10,7 +10,7 @@ let gen a b step =
   let (a, b, step) = (float a, float b, float step)
   let points = genValues (fun x -> sin x + x) a b step
 
-  savePointsToCsv points
+  printPoints points
 
 let getApproxFunc approxType =
   match approxType with
@@ -19,19 +19,19 @@ let getApproxFunc approxType =
   | _ -> failwith "Unknown approximation type. Avaliable: lagrange, segments"
 
 let run approxType a b step render =
-  let points = getPointsOfCsv()
+  let points = readPoints()
   let func = getApproxFunc approxType
 
   let (a, b, step) = (float a, float b, float step)
   let approxPoints = genValues (func points) a b step
 
   if render then
-    [ approxPoints; points ]
+    [ approxPoints; Seq.toList (Seq.sortBy fst points) ]
     |> Chart.Line
     |> Chart.WithHeight 1080
     |> Chart.Show
 
-  savePointsToCsv approxPoints
+  printPoints approxPoints
 
 let fail() =
   printfn "%s" (
