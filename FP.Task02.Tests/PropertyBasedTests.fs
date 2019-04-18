@@ -50,8 +50,8 @@ module PropertyBasedTests =
     let a = Seq.toList (tree.Traverse InFix)
     let b = Seq.toList (tree.Traverse PostFix)
 
-    allElementsEqual ((<)) a |> should be True
-    allElementsEqual ((>)) b |> should be True
+    a |> should be ascending
+    b |> should be descending
     tree.Min |> should equal a.Head
     tree.Max |> should equal b.Head
 

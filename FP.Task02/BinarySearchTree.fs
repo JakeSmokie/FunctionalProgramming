@@ -175,3 +175,22 @@ type BinarySearchTree =
     let c = Seq.sort (Seq.distinct (Seq.concat [ a; b ]))
 
     Empty.AddMany c
+
+  member this.Map f =
+    Empty.AddMany(Seq.map f (this.Traverse PreFix))
+
+  member this.Filter f =
+    let rec filter = function
+    | Empty -> Empty
+    | Node(x, _, _) as node when f x -> node 
+    | Node(x, _, _) as node ->
+      let (y, l, r) = (node.Delete x).Deconstruct()
+      Node(y, filter l, filter r)
+    
+    filter this
+
+  member this.Fold f state =
+    Seq.fold f state (this.Traverse InFix)
+    
+  member this.FoldBack f state =
+    Seq.foldBack f (this.Traverse InFix) state
