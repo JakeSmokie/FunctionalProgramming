@@ -10,8 +10,8 @@ let rec findRange t xs =
 
 let approximateByPoints points (t : float) =
   let rangeBounds =
-    PSeq.distinctBy (fun (x, y) -> x) points
-    |> PSeq.sortBy (fun (x, y) -> x)
+    PSeq.distinctBy fst points
+    |> PSeq.sortBy fst
     |> PSeq.toList
   
   let (min, _) = rangeBounds.Head
