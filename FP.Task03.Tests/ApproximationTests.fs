@@ -22,7 +22,7 @@ let validateOnRange app f a b step checkStep maxError =
 [<Fact>]
 let ``functions are interpolated correctly``() =
   validateOnRange interpolateByPoints sin -10.0 10.0 0.5 0.1 0.000001
-  validateOnRange interpolateByPoints ((+) 10.0) -10.0 10.0 0.5 0.1 0.00001
+  validateOnRange interpolateByPoints ((+) 10.0) -10.0 10.0 0.5 0.1 0.00002
   validateOnRange interpolateByPoints (sin >> cos >> (*) 10.0) -10.0 10.0 0.1 0.1 0.000001
   
   validateOnRange approximateByPoints sin -10.0 10.0 0.5 0.1 0.1

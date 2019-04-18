@@ -38,9 +38,8 @@ let ``Sin function is generated correctly``() =
   ]
   
   let actual = genValues sin 0.0 10.0 0.2
-  let check i (ax, ay) =
-    let (bx, by) = expected.[i]
+  let check (ax, ay) (bx, by) =
     abs (by - ay) |> should lessThan 0.0000000001
     abs (bx - ax) |> should lessThan 0.0000000001
   
-  List.iteri check actual
+  List.iter2 check actual expected
