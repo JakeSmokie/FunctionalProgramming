@@ -4,6 +4,9 @@ open Xunit
 open FsUnit.Xunit
 open FP.Task03.FunctionValuesGenerator
 
+let check (ax, ay) (bx, by) =
+  abs (by - ay) |> should lessThan 0.0000000001
+  abs (bx - ax) |> should lessThan 0.0000000001
 
 [<Fact>]
 let ``Linear function is generated correctly``() =
@@ -12,8 +15,8 @@ let ``Linear function is generated correctly``() =
     (6.0, 18.0); (7.0, 21.0); (8.0, 24.0); (9.0, 27.0); (10.0, 30.0)
   ]
 
-  genValues ((*) 3.0) 0.0 10.0 1.0
-  |> should equal expected
+  let actual = genValues ((*) 3.0) 0.0 10.0 1.0
+  Seq.iter2 check actual expected
 
 [<Fact>]
 let ``Sin function is generated correctly``() =
@@ -38,8 +41,4 @@ let ``Sin function is generated correctly``() =
   ]
   
   let actual = genValues sin 0.0 10.0 0.2
-  let check (ax, ay) (bx, by) =
-    abs (by - ay) |> should lessThan 0.0000000001
-    abs (bx - ax) |> should lessThan 0.0000000001
-  
-  List.iter2 check actual expected
+  Seq.iter2 check actual expected

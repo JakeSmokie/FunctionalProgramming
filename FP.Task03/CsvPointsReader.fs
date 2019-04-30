@@ -1,5 +1,6 @@
 module FP.Task03.CsvPointsReader
 open System
+open System
 open FSharp.Data
 
 type Points =
@@ -10,16 +11,12 @@ type Points =
 let rec readlines() = seq {
   let line = stdin.ReadLine()
   if line <> null then
-    yield line
+    yield Points.ParseRows(line).[0]
     yield! readlines()
 }
 
 let readPoints() =
-  let rawCsv = String.Join("\n", readlines())
-  let points = Points.ParseRows(rawCsv)
-
-  points |> Seq.map (fun row -> (row.X, row.Y))
+  readlines() |> Seq.map (fun row -> (row.X, row.Y))
 
 let printPoints points =
-  let doc = new Points(List.map Points.Row points)
-  printfn "%s" (doc.SaveToString())
+  Seq.iter (fun (x, y) -> printfn "%f;%f" x y) points

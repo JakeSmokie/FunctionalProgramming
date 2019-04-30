@@ -1,23 +1,16 @@
 module FP.Task03.LinearSegmentsApproximator
-open FSharp.Collections.ParallelSeq
+open FP.Task03.FunctionValuesGenerator
 
-let rec findRange t xs =
-  match xs with
-  | (ax, ay) :: (bx, by) :: tail
-    when t >= ax && t <= bx -> ((ax, ay), (bx, by))
-  | a :: b :: tail -> findRange t (b :: tail)
-  | _ -> failwith "Cannot find suitable range"
+let approximate points step =
+  let render ((ax, ay), (bx, by)) =
+    let func t =
+      ay + (t - ax) * (by - ay) / (bx - ax)
+    
+    genValues func ax bx step
 
-let approximateByPoints points (t : float) =
-  let rangeBounds =
-    PSeq.distinctBy fst points
-    |> PSeq.sortBy fst
-    |> PSeq.toList
+  Seq.map render (Seq.pairwise points)
+  |> Seq.concat
   
-  let (min, _) = rangeBounds.Head
-  let (max, _) = List.last rangeBounds
-  
-  let ((ax, ay), (bx, by)) =
-    findRange t rangeBounds
-
-  ay + (t - ax) * (by - ay) / (bx - ax)
+  // Pairwise example:
+  //   Seq.pairwise [1..5]
+  //   val it : seq<int * int> = seq [(1, 2); (2, 3); (3, 4); (4, 5)]

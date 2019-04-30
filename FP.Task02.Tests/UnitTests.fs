@@ -149,7 +149,7 @@ let ``Unbalanced input gets balanced``() =
   tree.IsBST |> should be True
   tree.IsBalanced |> should be True
   tree.Height |> should lessThanOrEqualTo (
-    int (Math.Log(float unbalancedTreeElements.Length, 2.0)) + 1
+    int (log (float unbalancedTreeElements.Length) / log 2.0) + 1
   )
 
 [<Fact>]
