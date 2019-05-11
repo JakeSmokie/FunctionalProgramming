@@ -5,12 +5,10 @@ let approximate points step =
   let render ((ax, ay), (bx, by)) =
     let func t =
       ay + (t - ax) * (by - ay) / (bx - ax)
-    
+
     genValues func ax bx step
 
-  Seq.map render (Seq.pairwise points)
+  points
+  |> Seq.pairwise
+  |> Seq.map render
   |> Seq.concat
-  
-  // Pairwise example:
-  //   Seq.pairwise [1..5]
-  //   val it : seq<int * int> = seq [(1, 2); (2, 3); (3, 4); (4, 5)]

@@ -1,22 +1,16 @@
 module FP.Task03.CsvPointsReader
-open System
-open System
-open FSharp.Data
 
-type Points =
-  CsvProvider<Separators=";",
-              Schema="x (float), y (float)",
-              HasHeaders=false>
+let parseLine (line : string) =
+  let coords =
+    line.Split(';') |> Array.map float
 
-let rec readlines() = seq {
-  let line = stdin.ReadLine()
-  if line <> null then
-    yield Points.ParseRows(line).[0]
-    yield! readlines()
-}
+  (coords.[0], coords.[1])
 
 let readPoints() =
-  readlines() |> Seq.map (fun row -> (row.X, row.Y))
+  Seq.initInfinite (fun _ -> stdin.ReadLine())
+  |> Seq.takeWhile (fun s -> s <> null && s <> "")
+  |> Seq.map parseLine
+  |> Seq.cache
 
 let printPoints points =
   Seq.iter (fun (x, y) -> printfn "%f;%f" x y) points

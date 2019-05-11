@@ -1,31 +1,33 @@
 module FP.Task03.LagrangeInterpolator
 open FP.Task03.FunctionValuesGenerator
 
-let interpolate points step minAmountOfPoints =
-  let lagrange points t =
-    let multipliers a =
-      Seq.filter (fun (x, y) -> x <> a) points
-      |> Seq.fold (fun acc (x, y) -> acc * (t - x) / (a - x)) 1.0
+let lagrange points t =
+  let multipliers a =
+    Seq.filter (fun (x, _) -> x <> a) points
+    |> Seq.fold (fun acc (x, _) -> acc * (t - x) / (a - x)) 1.0
 
-    Seq.sum (Seq.map (fun (x, y) -> y * multipliers x) points)
+  points
+  |> Seq.map (fun (x, y) -> y * multipliers x)
+  |> Seq.sum
 
-  let gen points a b =
-    genValues (lagrange points) (fst a) (fst b) step
+let gen points a b step =
+  genValues (lagrange points) (fst a) (fst b) step
 
-  let rec others prevPoints = seq {
-    match (Seq.tryHead points) with
-    | None -> yield! (Seq.empty)
-    | Some p ->
-      let newPoints = Seq.append prevPoints [ p ]
+let interpolate minAmountOfPoints points step =
+  let start = Seq.take minAmountOfPoints points
 
-      yield! gen newPoints (Seq.last prevPoints) p
-      yield! others newPoints
-    }
+  let genSegment i pair =
+    let segment =
+      Seq.take (minAmountOfPoints + i + 1) points
 
-  let start =
-    Seq.cache (Seq.take minAmountOfPoints points)
+    gen segment (fst pair) (snd pair) step
 
   seq {
-    yield! (gen start (Seq.head start) (Seq.last start))
-    yield! (others start)
+    yield! (gen start (Seq.head start) (Seq.last start) step)
+    yield! (points
+      |> Seq.skip (minAmountOfPoints - 1)
+      |> Seq.pairwise
+      |> Seq.mapi genSegment
+      |> Seq.concat
+    )
   }

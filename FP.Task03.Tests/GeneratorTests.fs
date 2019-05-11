@@ -39,6 +39,6 @@ let ``Sin function is generated correctly``() =
     (9.2, 0.2228899141); (9.4, 0.02477542545); (9.6, -0.1743267812);
     (9.8, -0.3664791293); (10.0, -0.5440211109)
   ]
-  
+
   let actual = genValues sin 0.0 10.0 0.2
   Seq.iter2 check actual expected

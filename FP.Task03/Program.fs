@@ -10,11 +10,18 @@ let main args =
   | [| "segments"; step; |] ->
     printPoints (approximate (readPoints()) (float step))
   | [| "lagrange"; step; minAmountOfPoints |] ->
-    printPoints (interpolate (readPoints()) (float step) (int minAmountOfPoints))
+    printPoints (interpolate (int minAmountOfPoints) (readPoints()) (float step))
+  | [| "both"; step; minAmountOfPoints |] ->
+    let points = readPoints()
+
+    seq {
+      yield! interpolate (int minAmountOfPoints) points (float step);
+      yield! approximate points (float step)
+    } |> printPoints
   | _ ->
     printfn "%s" (
-      "Usage: (type: lagrange | segments) (step : float)\n" +
-      "Example: lagrange 0.01\n"
+      "Usage: (type: lagrange | segments | both) (step : float) (minAmountOfPoints : uint)\n" +
+      "Example: lagrange 0.01 5\n"
     )
 
   0
