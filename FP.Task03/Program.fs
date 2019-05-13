@@ -28,11 +28,11 @@ let main args =
     approximate points (float step) |> printPoints
 
   | [| "lagrange"; step; minAmountOfPoints |] ->
-    interpolate points (float step) (int minAmountOfPoints) |> printPoints
+    interpolate (int minAmountOfPoints) points (float step) |> printPoints
 
   | [| "both"; step; minAmountOfPoints |] ->
     seq {
-      yield! interpolate points (float step) (int minAmountOfPoints);
+      yield! interpolate (int minAmountOfPoints) points (float step);
       yield! approximate points (float step)
     } |> printPoints
 

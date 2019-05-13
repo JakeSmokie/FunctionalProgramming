@@ -1,10 +1,10 @@
 module FP.Task03.LagrangeInterpolator
 open FP.Task03.FunctionValuesGenerator
 
-let lagrange points t =
-  let multipliers a =
-    Seq.filter (fun (x, _) -> x <> a) points
-    |> Seq.fold (fun acc (x, _) -> acc * (t - x) / (a - x)) 1.0
+let lagrange points x0 =
+  let multipliers ax =
+    Seq.filter (fun (x, _) -> x <> ax) points
+    |> Seq.fold (fun acc (x, _) -> acc * (x0 - x) / (ax - x)) 1.0
 
   points
   |> Seq.map (fun (x, y) -> y * multipliers x)
@@ -13,13 +13,20 @@ let lagrange points t =
 let gen points a b step =
   genValues (lagrange points) (fst a) (fst b) step
 
-let interpolate points step chunkSize =
+let windowedWithStep chunkSize step seq =
+  [ 0..Seq.length seq / step ]
+  |> Seq.map (fun i -> Seq.skip (i * step) seq |> Seq.truncate chunkSize)
+  |> Seq.filter (fun seq -> Seq.length seq = chunkSize)
+
+let interpolate chunkSize points step =
   let genSegment chunk =
-    gen chunk (Seq.item (chunkSize / 4) chunk) (Seq.item (chunkSize * 3 / 4) chunk) step
+    let left = Seq.item (chunkSize / 4) chunk
+    let right = Seq.item (chunkSize * 3 / 4) chunk
+    
+    gen chunk left right step
 
   points
-  |> Seq.windowed chunkSize
-  |> Seq.indexed
-  |> Seq.where (fun (i, _) -> i % (chunkSize / 2) = 0)
-  |> Seq.map (snd >> genSegment)
+  |> windowedWithStep chunkSize (chunkSize / 2)
+  |> Seq.map genSegment
   |> Seq.concat
+
