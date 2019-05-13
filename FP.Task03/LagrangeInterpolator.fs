@@ -13,21 +13,13 @@ let lagrange points t =
 let gen points a b step =
   genValues (lagrange points) (fst a) (fst b) step
 
-let interpolate minAmountOfPoints points step =
-  let start = Seq.take minAmountOfPoints points
+let interpolate points step chunkSize =
+  let genSegment chunk =
+    gen chunk (Seq.item (chunkSize / 4) chunk) (Seq.item (chunkSize * 3 / 4) chunk) step
 
-  let genSegment i pair =
-    let segment =
-      Seq.take (minAmountOfPoints + i + 1) points
-
-    gen segment (fst pair) (snd pair) step
-
-  seq {
-    yield! (gen start (Seq.head start) (Seq.last start) step)
-    yield! (points
-      |> Seq.skip (minAmountOfPoints - 1)
-      |> Seq.pairwise
-      |> Seq.mapi genSegment
-      |> Seq.concat
-    )
-  }
+  points
+  |> Seq.windowed chunkSize
+  |> Seq.indexed
+  |> Seq.where (fun (i, _) -> i % (chunkSize / 2) = 0)
+  |> Seq.map (snd >> genSegment)
+  |> Seq.concat

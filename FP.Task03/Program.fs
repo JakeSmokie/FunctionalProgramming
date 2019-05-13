@@ -1,23 +1,41 @@
 module FP.Task03.Program
 
+open System
 open FP.Task03.CsvPointsReader
 open FP.Task03.LagrangeInterpolator
 open FP.Task03.LinearSegmentsApproximator
+open XPlot.GoogleCharts
 
 [<EntryPoint>]
 let main args =
+ 
+//  let rand = new Random()
+//  let points =
+//    Seq.initInfinite float
+//    |> Seq.map (fun x -> (x, x + sin x * 10.0))
+//    |> Seq.take 100
+//  
+//  interpolate points 0.1 20
+//  |> Chart.Line
+//  |> Chart.WithHeight 1080
+//  |> Chart.WithWidth 1900
+//  |> Chart.Show
+  
+  let points = readPoints()
+
   match args with
   | [| "segments"; step; |] ->
-    printPoints (approximate (readPoints()) (float step))
-  | [| "lagrange"; step; minAmountOfPoints |] ->
-    printPoints (interpolate (int minAmountOfPoints) (readPoints()) (float step))
-  | [| "both"; step; minAmountOfPoints |] ->
-    let points = readPoints()
+    approximate points (float step) |> printPoints
 
+  | [| "lagrange"; step; minAmountOfPoints |] ->
+    interpolate points (float step) (int minAmountOfPoints) |> printPoints
+
+  | [| "both"; step; minAmountOfPoints |] ->
     seq {
-      yield! interpolate (int minAmountOfPoints) points (float step);
+      yield! interpolate points (float step) (int minAmountOfPoints);
       yield! approximate points (float step)
     } |> printPoints
+
   | _ ->
     printfn "%s" (
       "Usage: (type: lagrange | segments | both) (step : float) (minAmountOfPoints : uint)\n" +
@@ -25,5 +43,3 @@ let main args =
     )
 
   0
-
-
