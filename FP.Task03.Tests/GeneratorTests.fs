@@ -15,7 +15,7 @@ let ``Linear function is generated correctly``() =
     (6.0, 18.0); (7.0, 21.0); (8.0, 24.0); (9.0, 27.0); (10.0, 30.0)
   ]
 
-  let actual = genValues ((*) 3.0) 0.0 10.0 1.0
+  let actual = gen ((*) 3.0) 0.0 10.0 1.0
   Seq.iter2 check actual expected
 
 [<Fact>]
@@ -40,5 +40,5 @@ let ``Sin function is generated correctly``() =
     (9.8, -0.3664791293); (10.0, -0.5440211109)
   ]
 
-  let actual = genValues sin 0.0 10.0 0.2
+  let actual = gen sin 0.0 10.0 0.2
   Seq.iter2 check actual expected

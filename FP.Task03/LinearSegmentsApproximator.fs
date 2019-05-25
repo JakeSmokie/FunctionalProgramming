@@ -3,12 +3,11 @@ open FP.Task03.FunctionValuesGenerator
 
 let approximate points step =
   let render ((ax, ay), (bx, by)) =
-    let func t =
+    let line t =
       ay + (t - ax) * (by - ay) / (bx - ax)
 
-    genValues func ax bx step
+    gen line ax bx step
 
   points
   |> Seq.pairwise
-  |> Seq.map render
-  |> Seq.concat
+  |> Seq.collect render

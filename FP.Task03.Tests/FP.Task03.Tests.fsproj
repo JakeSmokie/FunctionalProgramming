@@ -5,9 +5,12 @@
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>false</GenerateProgramFile>
         <TargetFramework>net472</TargetFramework>
+        <OutputType>Exe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Expecto" Version="8.10.1" />
+        <PackageReference Include="Expecto.FsCheck" Version="8.10.1" />
         <PackageReference Include="FsUnit.xUnit" Version="3.4.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
         <PackageReference Include="xunit" Version="2.4.1" />
@@ -16,7 +19,9 @@
 
     <ItemGroup>
       <Compile Include="GeneratorTests.fs" />
-      <Compile Include="ApproximationTests.fs" />
+      <Content Include="Oof.fs" />
+      <Compile Include="TheoryDataBuilder.fs" />
+      <Compile Include="Tests.fs" />
     </ItemGroup>
 
     <ItemGroup>
