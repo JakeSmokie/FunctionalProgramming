@@ -6,9 +6,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="StateMachine.fs"/>
-        <Compile Include="Phone.fs"/>
-        <Compile Include="Program.fs"/>
+        <Compile Include="StateMachine.fs" />
+        <Compile Include="Phone.fs" />
+        <Compile Include="Archvile.fs" />
+        <Compile Include="Program.fs" />
     </ItemGroup>
 
 </Project>

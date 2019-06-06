@@ -3,17 +3,16 @@ open FP.Task04.Phone
 
 [<EntryPoint>]
 let main argv =
-  let a =
-    [phone]
-    /> CallDialed
-    /*> (CallConnected, "88005553535")
+  let states =
+    phone
+    /*> (CallDialed, "8800")
+    /> CallConnected
     /!> (SetVolume, 100)
     /> PlacedOnHold
-    /!> (SetVolume, 600)
-    /!> (Destroy, "")
-    /> PhoneHurledAgainstWall
+    /> TakenOffHold
+    /> CallEnded
 
-  a
+  states
   |> List.map (fun x -> x.Model, x.CurrentState)
   |> List.rev
   |> List.iter (printfn "%A")
