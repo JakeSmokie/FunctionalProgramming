@@ -5,22 +5,22 @@ open System
 open System
 open System
 
-type ParametrizedPermit<'a, 'b, 'c> = {
-  From : 'a
-  To : 'a
-  Trigger : 'b
-  Function : 'c
+type ParametrizedPermit<'state, 'trigger, 'func> = {
+  From : 'state
+  To : 'state
+  Trigger : 'trigger
+  Function : 'func
  }
 
-type Permit<'a, 'b> = {
-  From : 'a
-  To : 'a
-  Trigger : 'b
+type Permit<'state, 'trigger> = {
+  From : 'state
+  To : 'state
+  Trigger : 'trigger
  }
 
-type Action<'a, 'b> = {
-  Trigger : 'a
-  Function : 'b
+type Action<'trigger, 'func> = {
+  Trigger : 'trigger
+  Function : 'func
  }
 
 type StateMachine<'state, 'trigger, 'model> = {
@@ -40,7 +40,7 @@ let (<!>) (firstState, secondState) trigger = {
   Trigger = trigger
  }
 
-let (<?>) (permit : Permit<'a, 'b>) func = {
+let (<?>) (permit : Permit<'state, 'trigger>) func = {
   From = permit.From
   To = permit.To
   Trigger = permit.Trigger
