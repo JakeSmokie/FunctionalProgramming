@@ -28,7 +28,7 @@ type PhoneModel = {
   HoldTime : TimeSpan
  }
 
-let phone = [ {
+let phone = {
   CurrentState = OffHook
   Model = {
     Volume = 10
@@ -48,6 +48,9 @@ let phone = [ {
     OnHold => OffHook <!> CallEnded <*> (fun model -> { model with CallEnd = Some DateTime.Now })
 
     OnHold => PhoneDestroyed <!> PhoneHurledAgainstWall
+
+    OffHook => OnHold <!> CallConnected |> ignoredPermit
+    OffHook => Connected <!> CallConnected |> ignoredPermit
   ]
 
   ParametrizedPermits = [
@@ -58,4 +61,4 @@ let phone = [ {
     SetVolume <!!> (fun x model state -> ({ model with Volume = x :?> int }, state))
     Destroy <!!> (fun x model state -> (model, PhoneDestroyed))
   ]
- } ]
+ }

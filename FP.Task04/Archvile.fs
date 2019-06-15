@@ -28,7 +28,7 @@ type ArchvileModel = {
 
 let MaxArchvileHP = 700
 
-let archvile = [ {
+let archvile = {
   CurrentState = Waiting
   Model = {
     Health = MaxArchvileHP
@@ -42,12 +42,14 @@ let archvile = [ {
     Waiting => MakingFire <!> Attacking
     Chasing => MakingFire <!> Attacking
     MakingFire => Waiting <!> ShootFire
-
+    
     Waiting => Healing <!> StartedRevivingMonster
     Chasing => Healing <!> StartedRevivingMonster
-    Healing => Waiting <!> FinishedRevivingMonster <*> (fun model -> { model with RevivedAmount = model.RevivedAmount + 1 })
+    Healing => Waiting <!> FinishedRevivingMonster
+      <*> (fun model -> { model with RevivedAmount = model.RevivedAmount + 1 })
 
-    InPain => Waiting <!> PainStopped
+    InPain => Waiting <!> PainStopped    
+    MakingFire => Healing <!> FinishedRevivingMonster |> ignoredPermit
   ]
 
   Actions = [
@@ -72,7 +74,7 @@ let archvile = [ {
       if hpAdded < 0 then failwith "You cannot harm with healing"
 
       let newModel = { model with Health = model.Health + hpAdded }
-      
+
       match newModel.Health with
       | _ when state = Gibbed -> (model, Gibbed)
       | hp when hp > 0 -> (newModel, Waiting)
@@ -81,4 +83,4 @@ let archvile = [ {
   ]
 
   ParametrizedPermits = []
- } ]
+ }

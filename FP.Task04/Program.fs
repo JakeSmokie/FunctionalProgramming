@@ -1,20 +1,27 @@
-﻿open FP.Task04.StateMachine
-open FP.Task04.Phone
+﻿open FP.Task04
+open FP.Task04.StateMachine
+open FP.Task04.Archvile
 
 [<EntryPoint>]
 let main argv =
-  let states =
-    phone
-    /*> (CallDialed, "8800")
-    /> CallConnected
-    /!> (SetVolume, 100)
-    /> PlacedOnHold
-    /> TakenOffHold
-    /> CallEnded
-
-  states
-  |> List.map (fun x -> x.Model, x.CurrentState)
+  [ archvile ]
+  /> SeenSomeone
+  /> Attacking
+  /> ShootFire
+  /> StartedRevivingMonster
+  /!> (Damaged, 300)
+  /> PainStopped
+  /> StartedRevivingMonster
+  /> FinishedRevivingMonster
+  /!> (Damaged, 100)
+  /!> (Damaged, 50)
+  /> Attacking
+  /> ShootFire
+  /> SeenSomeone
+  /> ThinksAllClear
+  /!> (Damaged, 10000)
+  /!> (Healed, 10700)
   |> List.rev
-  |> List.iter (printfn "%A")
-  
+  |> statesAsDot
+
   0
