@@ -42,13 +42,13 @@ let archvile = {
     Waiting => MakingFire <!> Attacking
     Chasing => MakingFire <!> Attacking
     MakingFire => Waiting <!> ShootFire
-    
+
     Waiting => Healing <!> StartedRevivingMonster
     Chasing => Healing <!> StartedRevivingMonster
     Healing => Waiting <!> FinishedRevivingMonster
       <*> (fun model -> { model with RevivedAmount = model.RevivedAmount + 1 })
 
-    InPain => Waiting <!> PainStopped    
+    InPain => Waiting <!> PainStopped
     MakingFire => Healing <!> FinishedRevivingMonster |> ignoredPermit
   ]
 

@@ -1,5 +1,4 @@
-﻿open FP.Task04
-open FP.Task04.StateMachine
+﻿open FP.Task04.StateMachine
 open FP.Task04.Archvile
 
 [<EntryPoint>]
