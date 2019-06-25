@@ -1,26 +1,33 @@
-﻿open FP.Task04.StateMachine
-open FP.Task04.Archvile
+module FP.Task04.Program
+open System
+open System.Threading
+open FP.Task04.StateMachine
+open FP.Task04.TrafficLight
+
+let random = new Random()
+let rec loop sm =
+  let timeLeft = sm.Model.Ticks
+
+  printfn "\r                                      \r[%A %A %A]: %A"
+    sm.CurrentState sm.Model.ButtonPressed sm.Model.ShouldBeDisabled timeLeft
+
+  let sm =
+    if random.Next 10 = 1 then { sm with Model = { sm.Model with ButtonPressed = true } }
+    else sm
+
+//  let sm =
+//    if random.Next 20 = 1 then { sm with Model = { sm.Model with ShouldBeDisabled = true } }
+//    else sm
+
+  Thread.Sleep 10
+
+  if sm.CurrentState <> End then
+    loop (iterate sm)
 
 [<EntryPoint>]
-let main argv =
-  [ archvile ]
-  /> SeenSomeone
-  /> Attacking
-  /> ShootFire
-  /> StartedRevivingMonster
-  /!> (Damaged, 300)
-  /> PainStopped
-  /> StartedRevivingMonster
-  /> FinishedRevivingMonster
-  /!> (Damaged, 100)
-  /!> (Damaged, 50)
-  /> Attacking
-  /> ShootFire
-  /> SeenSomeone
-  /> ThinksAllClear
-  /!> (Damaged, 10000)
-  /!> (Healed, 10700)
-  |> List.rev
-  |> statesAsDot
+let main args =
+  let sm = createTrafficLight defaultTFParameters
+//  loop sm
 
+  sm.AsDot() |> printfn "%s"
   0

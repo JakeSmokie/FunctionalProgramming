@@ -7,8 +7,7 @@
 
     <ItemGroup>
         <Compile Include="StateMachine.fs" />
-        <Compile Include="Phone.fs" />
-        <Compile Include="Archvile.fs" />
+        <Compile Include="TrafficLight.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
