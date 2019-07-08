@@ -113,7 +113,7 @@ type 'a BST with
     fold (fun acc x -> insert x acc) Empty x
   
   static member Map(x : 'a BST, f: 'a -> 'b) : 'b BST =
-    f <!> toSeq x |> ofSeq
+    toSeq x |>> f |> ofSeq
   
   static member Zero =
     Empty
