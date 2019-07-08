@@ -43,7 +43,7 @@ let createTrafficLight p = {
 
   Permits = [
     Initial, Green, pTrue, setTicks p.GreenTicks
-    
+
     Green, End, (fun m -> m.ShouldBeDisabled), id
     End, Initial, (fun m -> not m.ShouldBeDisabled), id
 
@@ -73,6 +73,7 @@ let createTrafficLight p = {
 
   IgnoredPermits = [
     Red, Green, pTrue, id
+    Red, YellowToGreen, pTrue, id
   ]
  }
 

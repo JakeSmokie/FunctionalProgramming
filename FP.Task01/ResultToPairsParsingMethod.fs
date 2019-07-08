@@ -19,8 +19,9 @@ let getResult n =
     | _, _ when a % b = 0 && a / b < maxMultiplier -> true
     | _, _ -> checkFactors a (b - 1)
 
-  let p = PSeq.takeWhile (fun x -> x < maxPalindrome) palindromes
-  let filtered = PSeq.filter (fun x -> checkFactors x (maxMultiplier - 1)) p
-  let max = PSeq.max filtered
+  palindromes
+  |> takeWhile (fun x -> x < maxPalindrome)
+  |> filter (fun x -> checkFactors x (maxMultiplier - 1)) p
+  |> max filtered
 
   max

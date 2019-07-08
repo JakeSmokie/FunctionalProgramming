@@ -1,6 +1,7 @@
 ﻿open Expecto
 open FP.Task04.StateMachine
 open FP.Task04.TrafficLight
+open FP.Task04.Regex
 
 let testTFParameters = {
   GreenTicks = 5
@@ -48,6 +49,13 @@ let tests =
         Expect.equal (a |> getStates) aStates ""
         Expect.equal (b |> getStates) bStates ""
         Expect.equal (actual |> getStates) expected ""
+      }
+    ]
+    
+    testList "Regex tests" [
+      test "" {
+        let a = createRegex "abcde" |> iterateUntilStates [ Success; Failure ]
+        Expect.equal (List.last a).CurrentState Success ""
       }
     ]
   ]

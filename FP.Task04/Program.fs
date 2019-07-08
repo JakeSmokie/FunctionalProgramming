@@ -8,7 +8,7 @@ let random = new Random()
 let rec loop sm =
   let timeLeft = sm.Model.Ticks
 
-  printfn "\r                                      \r[%A %A %A]: %A"
+  printf "\r                                      \r[%A %A %A]: %A"
     sm.CurrentState sm.Model.ButtonPressed sm.Model.ShouldBeDisabled timeLeft
 
   let sm =
@@ -19,7 +19,7 @@ let rec loop sm =
 //    if random.Next 20 = 1 then { sm with Model = { sm.Model with ShouldBeDisabled = true } }
 //    else sm
 
-  Thread.Sleep 10
+  Thread.Sleep 1000
 
   if sm.CurrentState <> End then
     loop (iterate sm)
@@ -27,7 +27,7 @@ let rec loop sm =
 [<EntryPoint>]
 let main args =
   let sm = createTrafficLight defaultTFParameters
-//  loop sm
+  loop sm
 
   sm.AsDot() |> printfn "%s"
   0
