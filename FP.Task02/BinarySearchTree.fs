@@ -130,6 +130,10 @@ type 'a BST with
       |> Seq.sort
       |> ofSeq
 
+  static member (>>=) (x : _ BST, f : _ -> _ BST) =
+    toSeq x |>> f
+    |> Seq.fold (++) Empty
+
 let isBST (node : BST<_>) =
   node
   |> toSeq
